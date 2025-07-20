@@ -5,15 +5,20 @@ import type { PortableTextBlock } from 'sanity'
 import type { Metadata } from 'next'
 import AnimatedText from '@/components/AnimatedText'
 
-// Metadata fonksiyonu aynı kalıyor, dokunmuyoruz.
-type MetaProps = { params: { slug: string } }
-export async function generateMetadata({ params }: MetaProps): Promise<Metadata> {
-    const { slug } = params
-    const post = await client.fetch(groq`*[_type == "post" && slug.current == $slug][0]{title, excerpt}`, { slug })
-    return {
-        title: `${post?.title || 'Analiz'} | Adil Futbol`,
-        description: post?.excerpt,
-    }
+// Next.js App Router için doğru ve tam Props tipi tanımı
+type Props = {
+  params: { slug: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
+// Metadata fonksiyonunu da doğru Props tipiyle güncelliyoruz
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = params
+  const post = await client.fetch(groq`*[_type == "post" && slug.current == $slug][0]{title, excerpt}`, { slug })
+  return {
+    title: `${post?.title || 'Analiz'} | Adil Futbol`,
+    description: post?.excerpt,
+  }
 }
 
 interface Post {
@@ -28,9 +33,8 @@ const query = groq`*[_type == "post" && slug.current == $slug][0]{
   body
 }`
 
-// --- ANA DEĞİŞİKLİK BURADA ---
-// Karmaşık 'Props' tipi yerine 'any' kullanarak TypeScript'in bu noktadaki katı denetimini aşıyoruz.
-export default async function AnalizDetayPage({ params }: any) {
+// Sayfa component'ini de doğru Props tipiyle güncelliyoruz
+export default async function AnalizDetayPage({ params }: Props) {
   const { slug } = params
   const post: Post = await client.fetch(query, { slug })
 
