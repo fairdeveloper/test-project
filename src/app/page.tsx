@@ -10,6 +10,7 @@ import FeaturedPostCard from '@/components/FeaturedPostCard'
 import PostCard from '@/components/PostCard'
 import { MotionDiv } from '@/components/ClientMotion'
 import { FiArrowDown, FiCalendar } from 'react-icons/fi'
+export const revalidate = 60 // Sayfayı her 60 saniyede bir yeniden doğrula
 
 // Gerekli tüm veri tipleri
 interface Post { _id: string; title: string; slug: { current: string }; publishedAt: string; }

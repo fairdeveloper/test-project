@@ -3,6 +3,7 @@ import { groq } from 'next-sanity'
 import PostCard from '@/components/PostCard'
 import type { Metadata } from 'next'
 import { MotionDiv } from '@/components/ClientMotion' // motion yerine MotionDiv import ediyoruz
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Tüm Analizler ve Haftalık Değerlendirmeler | Adil Futbol',

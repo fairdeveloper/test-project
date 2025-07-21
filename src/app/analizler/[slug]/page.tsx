@@ -4,6 +4,7 @@ import { PortableText } from '@portabletext/react'
 import type { PortableTextBlock } from 'sanity'
 import type { Metadata } from 'next'
 import AnimatedText from '@/components/AnimatedText'
+export const revalidate = 60
 
 // Next.js App Router için doğru ve tam Props tipi tanımı
 type Props = {
