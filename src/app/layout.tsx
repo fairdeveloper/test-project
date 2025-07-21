@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
-import Link from 'next/link'
 import './globals.css'
 import Header from '@/components/Header'
 import PageWrapper from '@/components/PageWrapper'
@@ -28,16 +27,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr">
-      {/* TÜM TEMEL STİLLERİ DOĞRUDAN BODY ETİKETİNE UYGULUYORUZ */}
       <body className={`${inter.variable} ${jakarta.variable} font-sans bg-background text-primary-text`}>
         <div className="flex flex-col min-h-screen">
           <Header />
           <PageWrapper>
             <main>{children}</main>
           </PageWrapper>
-          <footer className="py-6 text-center text-secondary-text text-sm">
-            <p>© 2025 Adil Futbol. Tüm hakları saklıdır.</p>
-          </footer>
+          {/* Footer gibi diğer sabit elementler buraya eklenebilir */}
         </div>
       </body>
     </html>
