@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import Link from 'next/link'
 import './globals.css'
 import Header from '@/components/Header'
 import PageWrapper from '@/components/PageWrapper'
@@ -9,7 +10,6 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
-// Yeni logo fontumuzu tanımlıyoruz
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['700', '800'],
@@ -28,15 +28,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr">
-      {/* Her iki font değişkenini de body'ye ekleyerek tüm sitede kullanılabilir hale getiriyoruz */}
-      <body className={`${inter.variable} ${jakarta.variable} font-sans`}>
-        <Header />
-        <PageWrapper>
-          <main>{children}</main>
-        </PageWrapper>
-        <footer className="py-6 text-center text-secondary-text text-sm">
-          <p>© 2025 Adil Futbol. Tüm hakları saklıdır.</p>
-        </footer>
+      {/* TÜM TEMEL STİLLERİ DOĞRUDAN BODY ETİKETİNE UYGULUYORUZ */}
+      <body className={`${inter.variable} ${jakarta.variable} font-sans bg-background text-primary-text`}>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <PageWrapper>
+            <main>{children}</main>
+          </PageWrapper>
+          <footer className="py-6 text-center text-secondary-text text-sm">
+            <p>© 2025 Adil Futbol. Tüm hakları saklıdır.</p>
+          </footer>
+        </div>
       </body>
     </html>
   )
