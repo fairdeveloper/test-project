@@ -8,23 +8,11 @@ import { MotionDiv } from '@/components/ClientMotion'
 import { FiArrowDown } from 'react-icons/fi'
 import HomePageDashboard from '@/components/HomePageDashboard'
 
-// Bu satır, sayfanın Vercel'de dinamik olarak render edilmesini ve 
-// Sanity'deki değişikliklerin belirli aralıklarla yansımasını sağlar.
 export const revalidate = 60; 
 
-// Gerekli tipleri tanımlıyoruz
-interface Post { 
-  _id: string; 
-  title: string; 
-  slug: { current: string }; 
-  publishedAt: string; 
-}
-interface SiteAyarlari { 
-  anaSayfaManseti?: string; 
-  anaSayfaAltBasligi?: string; 
-}
+interface Post { _id: string; title: string; slug: { current: string }; publishedAt: string; }
+interface SiteAyarlari { anaSayfaManseti?: string; anaSayfaAltBasligi?: string; }
 
-// Ana sayfa artık 'async' ve veriyi sunucuda çekiyor
 export default async function HomePage() {
   const query = groq`{
     "siteAyarlari": *[_type == "siteAyarlari"][0],
@@ -32,20 +20,17 @@ export default async function HomePage() {
     "recentPosts": *[_type == "post"] | order(publishedAt desc)[1..3]
   }`;
   
-  // Veriyi çekerken tip ataması yapıyoruz
   const { siteAyarlari, featuredPost, recentPosts }: {
     siteAyarlari: SiteAyarlari | null,
     featuredPost: Post | null,
     recentPosts: Post[] | null
   } = await client.fetch(query);
 
-  // Manşeti belirliyoruz
   const manset = siteAyarlari?.anaSayfaManseti || featuredPost?.title || "Skor Tabelasının Ötesinde.";
   const altBaslik = siteAyarlari?.anaSayfaAltBasligi || "Haftanın panoraması ve en güncel analizler için aşağı kaydırın.";
 
   return (
     <main>
-      {/* Bölüm 1: Tam Ekran Manşet */}
       <section className="min-h-screen flex flex-col items-center justify-center relative p-4 text-center">
         <div>
           <AnimatedText 
@@ -63,10 +48,8 @@ export default async function HomePage() {
         </div>
       </section>
       
-      {/* Bölüm 2: İnteraktif Dashboard (Client Component) */}
       <HomePageDashboard />
 
-      {/* Bölüm 3: Analizler (Server Component'ten gelen veriyle) */}
       <section className="container mx-auto px-4 md:px-6 mt-16 border-t border-subtle-border pt-16 pb-24">
         <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-primary-text">Analizler</h2>

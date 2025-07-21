@@ -3,67 +3,12 @@
 import { useState, useEffect } from 'react'
 import { client } from '@/lib/sanity.client'
 import { groq } from 'next-sanity'
+import PuanTablosu, { PuanDurumu } from '@/components/PuanTablosu'
 import { FiCalendar } from 'react-icons/fi'
-import AnimatedNumber from '@/components/AnimatedNumber'
 
-// Tipleri doğrudan bu dosyada tanımlıyoruz, dışarıya bağımlılık kalmıyor.
-interface PuanDurumuSatiri {
-  _key: string; pozisyon: number; takim: string; puan: number;
-  oynananMac?: number; galibiyet?: number; beraberlik?: number;
-  maglubiyet?: number; averaj?: number;
-}
-interface PuanDurumu {
-  sezon: string; hafta: number; tabloSatirlari: PuanDurumuSatiri[];
-}
 interface Mac { _key: string; tarih: string; evSahibi: { isim: string }; deplasman: { isim: string }; skor: string; }
 interface FiksturHaftasi { hafta: number; maclar: Mac[]; }
 
-
-// PuanTablosu component'ini BU DOSYANIN İÇİNE alıyoruz
-function PuanTablosu({ tablo }: { tablo?: PuanDurumu }) {
-  if (!tablo || !tablo.tabloSatirlari) {
-    return (
-        <div className="bg-surface rounded-lg border border-subtle-border p-8 text-center text-secondary-text min-h-[400px] flex items-center justify-center">
-          Bu hafta için veri girilmemiş.
-        </div>
-    );
-  }
-  return (
-    <div className="overflow-x-auto bg-surface rounded-xl border border-subtle-border">
-      <table className="min-w-full text-left">
-        <thead className='border-b border-subtle-border'>
-          <tr>
-            <th className="p-3 text-xs font-semibold text-secondary-text text-center">#</th>
-            <th className="p-3 text-xs font-semibold text-secondary-text">Takım</th>
-            <th className="p-3 text-xs font-semibold text-secondary-text text-center">O</th>
-            <th className="p-3 text-xs font-semibold text-secondary-text text-center">G</th>
-            <th className="p-3 text-xs font-semibold text-secondary-text text-center">B</th>
-            <th className="p-3 text-xs font-semibold text-secondary-text text-center">M</th>
-            <th className="p-3 text-xs font-semibold text-secondary-text text-center">Avj</th>
-            <th className="p-3 text-xs font-semibold text-secondary-text text-center">Puan</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tablo.tabloSatirlari?.sort((a, b) => a.pozisyon - b.pozisyon).map((sira) => (
-            <tr key={sira._key} className="border-t border-subtle-border/50 hover:bg-slate-800/50 transition-colors">
-              <td className="p-3 text-sm text-secondary-text text-center">{sira.pozisyon}</td>
-              <td className="p-3 text-sm font-semibold text-primary-text">{sira.takim}</td>
-              <td className="p-3 text-sm text-secondary-text text-center"><AnimatedNumber toValue={sira.oynananMac || 0} /></td>
-              <td className="p-3 text-sm text-secondary-text text-center"><AnimatedNumber toValue={sira.galibiyet || 0} /></td>
-              <td className="p-3 text-sm text-secondary-text text-center"><AnimatedNumber toValue={sira.beraberlik || 0} /></td>
-              <td className="p-3 text-sm text-secondary-text text-center"><AnimatedNumber toValue={sira.maglubiyet || 0} /></td>
-              <td className="p-3 text-sm text-secondary-text text-center"><AnimatedNumber toValue={sira.averaj || 0} /></td>
-              <td className="p-3 text-sm font-bold text-primary-text text-center"><AnimatedNumber toValue={sira.puan} /></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-
-// Ana Dashboard Component'i
 export default function HomePageDashboard() {
   const [puanDurumu, setPuanDurumu] = useState<PuanDurumu | null>(null);
   const [fikstur, setFikstur] = useState<FiksturHaftasi[]>([]);
@@ -74,9 +19,15 @@ export default function HomePageDashboard() {
     const query = groq`{
       "puanDurumu": *[_type == "resmiPuanDurumu"] | order(sezon desc, hafta desc)[0],
       "fikstur": *[_type == "fiksturHaftasi"]{
-        hafta, maclar[]{ _key, tarih, skor, "evSahibi": evSahibi->{isim}, "deplasman": deplasman->{isim} }
+        hafta,
+        "maclar": maclar[]{
+          _key, tarih, skor,
+          "evSahibi": evSahibi->{isim},
+          "deplasman": deplasman->{isim}
+        }
       } | order(hafta asc)
     }`;
+    
     const fetchData = async () => {
       setLoading(true);
       const data = await client.fetch(query);
@@ -93,13 +44,11 @@ export default function HomePageDashboard() {
   const devreArasi = 17;
   const haftalar = Array.from({ length: toplamHafta }, (_, i) => i + 1);
   
-  if (loading) {
-    // Burada skeleton gösterebiliriz ama şimdilik basit tutuyoruz
-    return <div className="text-center p-16 container mx-auto">Haftanın Panoraması Yükleniyor...</div>;
-  }
-
   return (
     <section className="container mx-auto px-4 md:px-6 py-16">
+       <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary-text">Haftanın Panoraması</h2>
+       </div>
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 items-start">
           <div className="lg:col-span-2">
              <div className='flex justify-between items-center mb-4'>
@@ -111,11 +60,14 @@ export default function HomePageDashboard() {
                 <div className="flex flex-wrap justify-center gap-1.5">{haftalar.slice(devreArasi).map(hafta => (<button key={hafta} onClick={() => setSeciliHafta(hafta)} className={`w-8 h-8 text-xs rounded-md transition-colors ${ seciliHafta === hafta ? 'bg-accent-start text-white font-bold' : 'bg-slate-700 hover:bg-slate-600 text-secondary-text' }`}>{hafta}</button>))}</div>
              </div>
              <div className="bg-surface rounded-lg border border-subtle-border min-h-[400px] flex items-center justify-center">
-                { gosterilecekMaclar.length > 0 ? (<div className="w-full">{gosterilecekMaclar.map(mac => (<div key={mac._key} className="flex items-center justify-between p-3 border-b border-subtle-border last:border-none"><span className="text-primary-text font-semibold text-base w-2/5 text-right">{mac.evSahibi?.isim}</span><span className="text-secondary-text font-bold mx-2 bg-background px-3 py-1 rounded-md text-lg">{mac.skor || '-'}</span><span className="text-primary-text font-semibold text-base w-2/5 text-left">{mac.deplasman?.isim}</span></div>))}</div>) : <div className="p-8 text-center">Bu hafta için maç verisi bulunamadı.</div> }
+                {loading ? <div className="p-8 text-center">Yükleniyor...</div> : 
+                 gosterilecekMaclar.length > 0 ? (
+                    <div className="w-full">{gosterilecekMaclar.map(mac => (<div key={mac._key} className="flex flex-col md:flex-row items-center justify-between p-4 border-b border-subtle-border last:border-none"><div className='text-xs text-secondary-text flex items-center mb-2 md:mb-0 md:mr-4 shrink-0'><FiCalendar className="mr-2"/>{mac.tarih ? new Date(mac.tarih).toLocaleString('tr-TR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : 'Tarih Belirsiz'}</div><div className="flex items-center justify-center flex-grow w-full"><span className="text-primary-text font-semibold text-base md:text-lg text-right w-2/5 truncate">{mac.evSahibi?.isim}</span><span className="text-primary-text font-bold mx-2 bg-background px-4 py-2 rounded-md text-xl">{mac.skor || '-'}</span><span className="text-primary-text font-semibold text-base md:text-lg text-left w-2/5 truncate">{mac.deplasman?.isim}</span></div></div>))}</div>
+                 ) : <div className="p-8 text-center">Bu hafta için maç verisi bulunamadı.</div>
+                }
              </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-bold text-primary-text mb-4">Puan Durumu</h3>
+          <div className="space-y-8 mt-8 lg:mt-10">
             <PuanTablosu tablo={puanDurumu || undefined} />
           </div>
         </div>
