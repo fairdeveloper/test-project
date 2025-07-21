@@ -1,4 +1,4 @@
-'use client'
+'use client' 
 
 import { useState, useEffect } from 'react'
 import { client } from '@/lib/sanity.client'
@@ -6,7 +6,7 @@ import { groq } from 'next-sanity'
 import { FiCalendar } from 'react-icons/fi'
 import AnimatedNumber from '@/components/AnimatedNumber'
 
-// Tipleri doğrudan bu dosyada tanımlıyoruz
+// Tipleri doğrudan bu dosyada tanımlıyoruz, dışarıya bağımlılık kalmıyor.
 interface PuanDurumuSatiri {
   _key: string; pozisyon: number; takim: string; puan: number;
   oynananMac?: number; galibiyet?: number; beraberlik?: number;
@@ -18,7 +18,8 @@ interface PuanDurumu {
 interface Mac { _key: string; tarih: string; evSahibi: { isim: string }; deplasman: { isim: string }; skor: string; }
 interface FiksturHaftasi { hafta: number; maclar: Mac[]; }
 
-// PuanTablosu component'ini artık bu dosyanın içine alıyoruz
+
+// PuanTablosu component'ini BU DOSYANIN İÇİNE alıyoruz
 function PuanTablosu({ tablo }: { tablo?: PuanDurumu }) {
   if (!tablo || !tablo.tabloSatirlari) {
     return (
@@ -62,6 +63,7 @@ function PuanTablosu({ tablo }: { tablo?: PuanDurumu }) {
 }
 
 
+// Ana Dashboard Component'i
 export default function HomePageDashboard() {
   const [puanDurumu, setPuanDurumu] = useState<PuanDurumu | null>(null);
   const [fikstur, setFikstur] = useState<FiksturHaftasi[]>([]);
@@ -92,7 +94,8 @@ export default function HomePageDashboard() {
   const haftalar = Array.from({ length: toplamHafta }, (_, i) => i + 1);
   
   if (loading) {
-    return <div className="text-center p-16">Yükleniyor...</div>;
+    // Burada skeleton gösterebiliriz ama şimdilik basit tutuyoruz
+    return <div className="text-center p-16 container mx-auto">Haftanın Panoraması Yükleniyor...</div>;
   }
 
   return (
