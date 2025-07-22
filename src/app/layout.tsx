@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
-import { Suspense } from 'react' // YENİ IMPORT
+import Script from 'next/script' // Next.js'in Script component'ini import ediyoruz
 import './globals.css'
 import Header from '@/components/Header'
 import PageWrapper from '@/components/PageWrapper'
-import Analytics from '@/components/Analytics'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -22,6 +21,8 @@ export const metadata: Metadata = {
   description: 'Futbolun adalet merceği.',
 }
 
+const gaId = process.env.NEXT_PUBLIC_GA_ID;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,6 +30,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr">
+      {/* GOOGLE ANALYTICS KODUNU BURAYA EKLİYORUZ */}
+      <head>
+        <Script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        ></Script>
+        <Script id="google-analytics">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gaId}');
+          `}
+        </Script>
+      </head>
+
       <body className={`${inter.variable} ${jakarta.variable} font-sans bg-background text-primary-text`}>
         <div className="flex flex-col min-h-screen">
           <Header />
@@ -39,10 +56,6 @@ export default function RootLayout({
             <p>© 2025 Adil Futbol. Tüm hakları saklıdır.</p>
           </footer>
         </div>
-        {/* Analytics component'ini Suspense ile sarmalıyoruz */}
-        <Suspense>
-          <Analytics />
-        </Suspense>
       </body>
     </html>
   )
