@@ -2,8 +2,9 @@
 /// <reference types="next/image-types/global" />
 
 // NOTE: This file should not be edited
-// see https://nextjs.org/docs/basic-features/typescript for more information.
+// See https://nextjs.org/docs/basic-features/typescript for more information.
 
+// Google Analytics için gtag tip tanımını buraya ekliyoruz
 interface Window {
   gtag: (
     event: 'config',
