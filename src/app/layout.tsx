@@ -3,6 +3,7 @@ import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import PageWrapper from '@/components/PageWrapper'
+import Analytics from '@/components/Analytics' // Yeni component'i import ediyoruz
 
 const inter = Inter({
   subsets: ['latin'],
@@ -33,8 +34,12 @@ export default function RootLayout({
           <PageWrapper>
             <main>{children}</main>
           </PageWrapper>
-          {/* Footer gibi diğer sabit elementler buraya eklenebilir */}
+          <footer className="py-6 text-center text-secondary-text text-sm">
+            <p>© 2025 Adil Futbol. Tüm hakları saklıdır.</p>
+          </footer>
         </div>
+        {/* Analytics component'ini body'nin sonuna ekliyoruz */}
+        <Analytics />
       </body>
     </html>
   )
