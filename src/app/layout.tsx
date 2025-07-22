@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import { Suspense } from 'react' // YENİ IMPORT
 import './globals.css'
 import Header from '@/components/Header'
 import PageWrapper from '@/components/PageWrapper'
-import Analytics from '@/components/Analytics' // Yeni component'i import ediyoruz
+import Analytics from '@/components/Analytics'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -38,8 +39,10 @@ export default function RootLayout({
             <p>© 2025 Adil Futbol. Tüm hakları saklıdır.</p>
           </footer>
         </div>
-        {/* Analytics component'ini body'nin sonuna ekliyoruz */}
-        <Analytics />
+        {/* Analytics component'ini Suspense ile sarmalıyoruz */}
+        <Suspense>
+          <Analytics />
+        </Suspense>
       </body>
     </html>
   )
